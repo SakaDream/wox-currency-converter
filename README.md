@@ -1,5 +1,5 @@
 # Wox Currency Converter
-A easy-to-use Currency Converter for Wox. Currency API by [http://www.currencyconverterapi.com/](http://www.currencyconverterapi.com/)
+An easy-to-use Currency Converter for Wox. Currency API by [http://www.currencyconverterapi.com/](http://www.currencyconverterapi.com/)
 
 # Features
 Auto convert based on Windows localization
