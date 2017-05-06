@@ -1,0 +1,12 @@
+﻿{
+  "ID":"1CA7D704C07F4D7BB6ACE4ADB24366AE",
+  "ActionKeyword":"*",
+  "Name":"Currency",
+  "Description":"A easy-to-use Currency Converter for Wox",
+  "Author":"SakaDream",
+  "Version":"1.0.0",
+  "Language":"csharp",
+  "Website":"https://github.com/SakaDream/wox-currency-converter",
+  "IcoPath": "Images\\icon.png",
+  "ExecuteFileName":"Currency.dll"
+}
