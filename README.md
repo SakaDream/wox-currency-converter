@@ -22,4 +22,4 @@ Convert using native speak or Google Search style
 
 # Changelog
 - v1.0.0 (05/06/2017 07:19 GMT) : First Release
-- v1.0.1 (06/06/2017 07:50 GMT) : Auto convert based on computer's location, instead of Windows Region
+- v1.0.1 (05/07/2017 07:50 GMT) : Auto convert based on computer's location, instead of Windows Region
