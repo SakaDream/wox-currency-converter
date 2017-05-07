@@ -89,7 +89,7 @@ namespace Currency
                     return new List<Result>();
                 }
             }
-            catch(Exception)
+            catch(Exception e)
             {
                 //return Debug(query.RawQuery + ". Inside catch: " + e.Message);
                 return new List<Result>();
@@ -110,21 +110,6 @@ namespace Currency
                 return responeString.Equals("{ }") ? -1 : Decimal.Parse(json[query].ToString(), NumberStyles.Float, CultureInfo.InvariantCulture);
             }
         }
-
-        //private string APIDebug(string fromCurrency, string toCurrency)
-        //{
-        //    string query = fromCurrency + "_" + toCurrency;
-        //    var url = $"http://free.currencyconverterapi.com/api/v3/convert?q={query}&compact=ultra";
-        //    var request = (HttpWebRequest)WebRequest.Create(url);
-        //    request.Method = "GET";
-        //    var respone = (HttpWebResponse)request.GetResponse();
-        //    using (new StreamReader(respone.GetResponseStream()))
-        //    {
-        //        var responeString = new StreamReader(respone.GetResponseStream()).ReadToEnd();
-        //        var json = JObject.Parse(responeString);
-        //        return url + ", " + json[query];
-        //    }
-        //}
 
         public List<Result> GetResult(SearchParams sp)
         {
@@ -147,9 +132,25 @@ namespace Currency
                     IcoPath = "Images/icon.png"
                 });
             }
-            // Debug: Add {APIDebug(sp.FromCurrency, sp.ToCurrency)} to Result.Title
+            //Debug: Add {APIDebug(sp.FromCurrency, sp.ToCurrency)} to Result.Title
             return results;
         }
+
+        #region Debug
+        //private string APIDebug(string fromCurrency, string toCurrency)
+        //{
+        //    string query = fromCurrency + "_" + toCurrency;
+        //    var url = $"http://free.currencyconverterapi.com/api/v3/convert?q={query}&compact=ultra";
+        //    var request = (HttpWebRequest)WebRequest.Create(url);
+        //    request.Method = "GET";
+        //    var respone = (HttpWebResponse)request.GetResponse();
+        //    using (new StreamReader(respone.GetResponseStream()))
+        //    {
+        //        var responeString = new StreamReader(respone.GetResponseStream()).ReadToEnd();
+        //        var json = JObject.Parse(responeString);
+        //        return url + ", " + json[query];
+        //    }
+        //}
 
         //public List<Result> Debug(SearchParams sp)
         //{
@@ -203,5 +204,6 @@ namespace Currency
 
         //    return results;
         //}
+        #endregion
     }
 }
