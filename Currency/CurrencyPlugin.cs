@@ -1,25 +1,26 @@
-﻿using Currency.Models;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Net;
 using System.Text.RegularExpressions;
 using Wox.Plugin;
+using HtmlCrawler;
 
 namespace Currency
 {
     class CurrencyPlugin : IPlugin
     {
         private PluginInitContext _context;
+        private Crawler _crawler;
+
         private readonly string currencyCheckPattern = @"cur\s([A-Za-z]{3})"; //cur usd
         private readonly string oneWaycheckPattern = @"^(\d+(\.\d{1,2})?)?\s([A-Za-z]{3})$"; //10 usd
         private readonly string inCheckPattern = @"(\d+(\.\d{1,2})?)?\s([A-Za-z]{3})\s([i][n])\s([A-Za-z]{3})"; // 10 usd in vnd
         private readonly string equalCheckPattern = @"(\d+(\.\d{1,2})?)?\s([A-Za-z]{3})\s([=])\s([A-Za-z]{3})"; // 10 usd = vnd
 
-        public void Init(PluginInitContext context) { _context = context; }
+        public void Init(PluginInitContext context)
+        {
+            _context = context;
+            _crawler = new Crawler();
+        }
 
         public List<Result> Query(Query query)
         {
@@ -34,7 +35,6 @@ namespace Currency
                     }
                     else
                     {
-                        //return Debug("not currency way");
                         return new List<Result>();
                     }
                 }
@@ -47,7 +47,6 @@ namespace Currency
                     }
                     else
                     {
-                        //return Debug("not one way");
                         return new List<Result>();
                     }
                 }
@@ -63,7 +62,6 @@ namespace Currency
                     }
                     else
                     {
-                        //return Debug("not in way");
                         return new List<Result>();
                     }
                 }
@@ -79,49 +77,49 @@ namespace Currency
                     }
                     else
                     {
-                        //return Debug("not equal way");
                         return new List<Result>();
                     }
                 }
                 else
                 {
-                    //return Debug(query.RawQuery + ". Inside else");
                     return new List<Result>();
                 }
             }
             catch(Exception e)
             {
-                //return Debug(query.RawQuery + ". Inside catch: " + e.Message);
-                return new List<Result>();
+                return GetMessage("Something went wrong...", e.Message);
             }
         }
 
-        private decimal GetRate(string fromCurrency, string toCurrency)
+        private decimal GetExchange(string fromCurrency, string toCurrency, decimal amount)
         {
-            string query = fromCurrency + "_" + toCurrency;
-            var url = $"http://free.currencyconverterapi.com/api/v3/convert?q={query}&compact=ultra";
-            var request = (HttpWebRequest)WebRequest.Create(url);
-            request.Method = "GET";
-            var respone = (HttpWebResponse)request.GetResponse();
-            using (new StreamReader(respone.GetResponseStream()))
-            {
-                var responeString = new StreamReader(respone.GetResponseStream()).ReadToEnd();
-                var json = JObject.Parse(responeString);
-                return responeString.Equals("{ }") ? -1 : Decimal.Parse(json[query].ToString(), NumberStyles.Float, CultureInfo.InvariantCulture);
-            }
+            var url = $"http://www.xe.com/currencyconverter/convert/?Amount={amount}&From={fromCurrency}&To={toCurrency}";
+            _crawler.UpdateDocument(url);
+            var resultNode = _crawler.GetElementByClass("uccResultAmount");
+            var toCurrencyCodeNode = _crawler.GetElementByClass("uccToCurrencyCode");
+            return (CheckToCurrencyCode(toCurrency, toCurrencyCodeNode.InnerText))
+                ? Decimal.Parse(resultNode.InnerText)
+                : -1;
+        }
+
+        private bool CheckToCurrencyCode(string toCurrencyInput, string toCurrencyCrawled)
+        {
+            return toCurrencyInput.Equals(toCurrencyCrawled);
         }
 
         public List<Result> GetResult(SearchParams sp)
         {
             var results = new List<Result>();
-            decimal rate = GetRate(sp.FromCurrency, sp.ToCurrency);
-            if (rate != -1)
+
+            var exchange = GetExchange(sp.FromCurrency, sp.ToCurrency, sp.Amount);
+
+            if (exchange > 0)
             {
                 results.Add(new Result
                 {
-                    Title = $"{sp.Amount.ToString("N")} {sp.FromCurrency} = {(sp.Amount * rate).ToString("N")} {sp.ToCurrency}",
+                    Title = $"{sp.Amount:N} {sp.FromCurrency} = {exchange:N} {sp.ToCurrency}",
                     IcoPath = "Images/icon.png",
-                    SubTitle = "Source: www.currencyconverterapi.com"
+                    SubTitle = $"Source: http://www.xe.com/currencyconverter/"
                 });
             }
             else
@@ -133,6 +131,33 @@ namespace Currency
                 });
             }
             //Debug: Add {APIDebug(sp.FromCurrency, sp.ToCurrency)} to Result.Title
+            return results;
+        }
+
+        public List<Result> GetMessage(string message)
+        {
+            var results = new List<Result>();
+
+            results.Add(new Result
+            {
+                Title = $"Error: {message}",
+                IcoPath = "Images/icon.png"
+            });
+
+            return results;
+        }
+
+        public List<Result> GetMessage(string message, string desc)
+        {
+            var results = new List<Result>();
+
+            results.Add(new Result
+            {
+                Title = $"Error: {message}",
+                SubTitle = $"{desc}",
+                IcoPath = "Images/icon.png"
+            });
+
             return results;
         }
 
