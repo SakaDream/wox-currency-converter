@@ -1,6 +1,12 @@
 # Wox Currency Converter
 An easy-to-use Currency Converter for Wox. Foreign Exchange Rate Source by [http://www.xe.com/currencyconverter/](http://www.xe.com/currencyconverter/)
 
+# Install
+
+`wpm install Currency`
+
+![](https://puu.sh/yJQsZ.png)
+
 # Features
 **New in v1.0.1!** Auto convert based on computer's location (Public IP) 
 
