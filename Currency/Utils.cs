@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using HtmlCrawler;
 using Wox.Plugin;
 
@@ -34,8 +35,8 @@ namespace Currency
         {
             var url = $"http://www.xe.com/currencyconverter/convert/?Amount={amount}&From={fromCurrency}&To={toCurrency}";
             _crawler.UpdateDocument(url);
-            var resultNode = _crawler.GetElementByClass("uccResultAmount");
-            var toCurrencyCodeNode = _crawler.GetElementByClass("uccToCurrencyCode");
+            var resultNode = _crawler.GetElementsByClass("uccResultAmount").First();
+            var toCurrencyCodeNode = _crawler.GetElementsByClass("uccToCurrencyCode").First();
             return (CheckToCurrencyCode(toCurrency, toCurrencyCodeNode.InnerText))
                 ? Decimal.Parse(resultNode.InnerText, new CultureInfo("en-US"))
                 : -1;
