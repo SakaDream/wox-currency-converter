@@ -87,7 +87,7 @@ namespace Currency
             }
             catch(Exception e)
             {
-                return _utils.GetMessage("Something went wrong...", e.StackTrace);
+                return _utils.GetMessage("Something went wrong...", e.Message);
             }
         }
     }
